@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map with Two Locations</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Map Showing Barnes & Noble and 555, 5th Avenue</h2>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    // Initialize the map and set its view to New York
+    var map = L.map('map').setView([40.7558, -73.9787], 16); // Centered around the given coordinates
+
+    // Load and display the tile layer on the map (using OpenStreetMap tiles)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add markers for the two locations
+    var barnesNoble = L.marker([40.7558228, -73.9787965]).addTo(map)
+        .bindPopup("<b>Barnes & Noble</b><br>555, 5th Avenue, Midtown East").openPopup();
+
+    var address = L.marker([40.7558017, -73.9787414]).addTo(map)
+        .bindPopup("<b>555, 5th Avenue</b><br>Midtown East, Manhattan").openPopup();
+</script>
+
+</body>
+</html>
