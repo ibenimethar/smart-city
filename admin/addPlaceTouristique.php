@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="flex flex-col h-full justify-between bg-gray-100">
 	
     <div class="container mx-auto mt-8">
-        <h1 class="text-4xl font-bold mb-4 text-purple-700 text-center">Ajouter une Place Touristique</h1>
+        <h1 class="text-4xl font-bold mb-4 text-blue-500 text-center">Ajouter une Place Touristique</h1>
         <form action="" method="post" enctype="multipart/form-data" class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
 
             <div class="mb-4">
@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="flex items-center justify-center mt-6">
-                <button type="submit" class="bg-purple-500 text-white p-2 rounded-md shadow-2xl w-1/3">Ajouter</button>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded-md shadow-2xl w-1/3">Ajouter</button>
             </div>
 
         </form>

@@ -53,7 +53,7 @@ $connection->close();
 </head>
 <body class="flex h-screen bg-gradient-to-r from-green-500 via-green-500 to-purple-500">
 <br>
-<div class="w-full h-full bg-gradient-to-r from-green-500 via-green-500 to-purple-500 flex flex-col justify-center items-center text-white rounded-2xl">
+<div class="w-full h-full bg-gradient-to-r from-blue-500 via-blue-400 to-purple-500 flex flex-col justify-center items-center text-white rounded-2xl">
     <br><br><br>
     <h3 class="text-center mt-4 text-3xl mb-8">Bienvenue Administrateur</h3>
 

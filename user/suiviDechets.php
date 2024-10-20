@@ -33,15 +33,14 @@ $result = $connection->query($sql);
     <table class="w-full border-collapse border border-gray-300">
         <thead>
             <tr class="bg-gray-200">
-                <th class="p-2">ID</th>
-                <th class="p-2">Latitude</th>
-                <th class="p-2">Longitude</th>
-                <th class="p-2">Date et Heure Prévues</th>
-                <th class="p-2">Statut</th>
-                <th class="p-2">Amenity</th>
-                <th class="p-2">Road</th>
-                <th class="p-2">Suburb</th>
-                <th class="p-2">City</th>
+                <th class="border p-2 ">ID</th>
+                <th class=" border p-2 ">Location</th>
+                <th class="border p-2 whitespace-nowrap">Date et Heure Prévues</th>
+                <th class="border p-2 ">camion</th>
+                <th class="border p-2 ">Amenity</th>
+                <th class="border p-2 ">Road</th>
+                <th class="border p-2 ">Suburb</th>
+                <th class="border p-2 ">City</th>
             </tr>
         </thead>
         <tbody>
@@ -51,15 +50,14 @@ $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {
     ?>
     <tr class="border-t border-gray-300">
-    <td class="p-2"><?php echo isset($row['id']) ? $row['id'] : 'N/A'; ?></td>
-    <td class="p-2"><?php echo isset($row['latitude']) ? $row['latitude'] : 'N/A'; ?></td>
-    <td class="p-2"><?php echo isset($row['longitude']) ? $row['longitude'] : 'N/A'; ?></td>
-    <td class="p-2"><?php echo isset($row['date_heure_prevue']) ? $row['date_heure_prevue'] : 'N/A'; ?></td> <!-- Removed the extra space -->
-    <td class="p-2"><?php echo isset($row['statut']) ? $row['statut'] : 'N/A'; ?></td>
-    <td class="p-2"><?php echo isset($row['amenity']) ? $row['amenity'] : 'N/A'; ?></td>
-    <td class="p-2"><?php echo isset($row['road']) ? $row['road'] : 'N/A'; ?></td>
-    <td class="p-2"><?php echo isset($row['suburb']) ? $row['suburb'] : 'N/A'; ?></td>
-    <td class="p-2"><?php echo isset($row['city']) ? $row['city'] : 'N/A'; ?></td>
+    <td class="border p-2"><?php echo isset($row['id']) ? $row['id'] : 'N/A'; ?></td>
+    <td class=" border p-2 "><?php echo isset($row['localisation']) ? $row['localisation'] : 'N/A'; ?></td>
+    <td class="border p-2"><?php echo isset($row['date_heure_prevue']) ? $row['date_heure_prevue'] : 'N/A'; ?></td> <!-- Removed the extra space -->
+    <td class="border p-2"><?php echo isset($row['camion']) ? $row['camion'] : 'N/A'; ?></td>
+    <td class="border p-2"><?php echo isset($row['amenity']) ? $row['amenity'] : 'N/A'; ?></td>
+    <td class="border p-2"><?php echo isset($row['road']) ? $row['road'] : 'N/A'; ?></td>
+    <td class="border p-2"><?php echo isset($row['suburb']) ? $row['suburb'] : 'N/A'; ?></td>
+    <td class="border p-2"><?php echo isset($row['city']) ? $row['city'] : 'N/A'; ?></td>
 </tr>
 
     <?php
@@ -79,7 +77,7 @@ $result = $connection->query($sql);
             <h3 class="text-2xl font-bold mb-4 text-purple-700 font-mono">À propos du Suivi des Déchets</h3>
             <p class="text-gray-700">
                 Le suivi des déchets fournit des informations essentielles sur la collecte des déchets, y compris les détails sur la localisation,
-                la date et l'heure prévues, le statut et d'autres informations pertinentes. Explorez les données pour une gestion efficace des déchets
+                la date et l'heure prévues, le camion et d'autres informations pertinentes. Explorez les données pour une gestion efficace des déchets
                 dans votre ville.
             </p>
         </div>

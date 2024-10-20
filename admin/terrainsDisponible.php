@@ -36,7 +36,9 @@ if ($result->num_rows > 0) {
                             <h2 class="text-lg font-bold mb-2"><?= $terrain['nom'] ?></h2>
                             <p class="text-gray-700 mb-2"><strong>Description:</strong> <?= $terrain['description'] ?></p>
                             <p class="text-gray-700 mb-2"><strong>Disponibilité:</strong> <?= $terrain['disponibilite'] ? 'Disponible' : 'Indisponible' ?></p>
-                            <a href="Reservation?idTerrain=<?= $terrain['id'] ?>" class="bg-purple-500 text-white p-2 rounded-md shadow-2xl inline-block">Réserver</a>
+                            <a href="../user/reservationForm.php?idTerrain=<?= $terrain['id'] ?>&nomTerrain=<?= urlencode($terrain['nom']) ?>" class="bg-purple-500 text-white p-2 rounded-md shadow-2xl inline-block">Réserver</a>
+
+
                         </div>
                     </div>
                 <?php } ?>

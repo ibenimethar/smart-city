@@ -20,20 +20,21 @@ $message = ''; // Initialize message variable
 // Handle form submission for adding a new record
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action']) && $_GET['action'] == 'ajout') {
     // Validate that all required POST data is set
-    if (isset($_POST['latitude'], $_POST['longitude'], $_POST['dateHeurePrevue'], $_POST['statut'], $_POST['amenity'], $_POST['road'], $_POST['suburb'], $_POST['city'])) {
+    if (isset($_POST['latitude'], $_POST['longitude'], $_POST['dateHeurePrevue'], $_POST['camion'], $_POST['amenity'], $_POST['road'], $_POST['suburb'], $_POST['city'])) {
         $latitude = mysqli_real_escape_string($connection, $_POST['latitude']);
         $longitude = mysqli_real_escape_string($connection, $_POST['longitude']);
         $dateHeurePrevue = mysqli_real_escape_string($connection, $_POST['dateHeurePrevue']);
-        $statut = mysqli_real_escape_string($connection, $_POST['statut']);
+        $camion = mysqli_real_escape_string($connection, $_POST['camion']);
         $amenity = mysqli_real_escape_string($connection, $_POST['amenity']);
         $road = mysqli_real_escape_string($connection, $_POST['road']);
         $suburb = mysqli_real_escape_string($connection, $_POST['suburb']);
         $city = mysqli_real_escape_string($connection, $_POST['city']);
         $localisation = mysqli_real_escape_string($connection, $_POST['localisation']);
+        $statut = mysqli_real_escape_string($connection, $_POST['statut']);
 
         // Prepare the insert SQL statement
-        $sql = "INSERT INTO suivi_dechets (`latitude`, `longitude`, `date_heure_prevue`, `statut`, `amenity`, `road`, `suburb`, `city`,`localisation`) VALUES ('$latitude', '$longitude', '$dateHeurePrevue', '$statut', '$amenity', '$road', '$suburb', '$city','$localisation')";
-
+        $sql = "INSERT INTO suivi_dechets (`latitude`, `longitude`, `date_heure_prevue`, `camion`, `amenity`, `road`, `suburb`, `city`, `localisation`, `statut`) VALUES ('$latitude', '$longitude', '$dateHeurePrevue', '$camion', '$amenity', '$road', '$suburb', '$city', '$localisation', '$statut')";
+        
         // Execute the insert SQL query
         if ($connection->query($sql) === TRUE) {
             // Set success message
@@ -69,7 +70,7 @@ $result = $connection->query($sql);
     </style>
 </head>
 <body class="bg-gray-100 p-8">
-    <h1 class="text-4xl font-bold mb-8 text-purple-700 text-center">Suivi Des Déchets - Admin</h1>
+    <h1 class="text-4xl font-bold mb-8 text-blue-500 text-center">Suivi Des Déchets - Admin</h1>
 
     <!-- Message display -->
     <div class="mb-4 text-center">
@@ -88,15 +89,16 @@ $result = $connection->query($sql);
     <table class="border-collapse w-full mb-8">
         <thead>
             <tr class="bg-gray-200">
-                <th class="border p-2">ID</th>
-                <th class="border p-2">Location</th>
-                <th class="border p-2 " style="width: 200px  ;">Date et Heure Prévues</th>
-                <th class="border p-2">Statut</th>
-                <th class="border p-2">Amenity</th>
-                <th class="border p-2">Road</th>
-                <th class="border p-2">Suburb</th>
-                <th class="border p-2">City</th>
-                <th class="border p-2">Action</th>
+                <th class="border  py-2 ">ID</th>
+                <th class="border  py-2 ">Location</th>
+                <th class="border  py-2  " style="width: 200px  ;">Date et Heure Prévues</th>
+                <th class="border  py-2 ">camion</th>
+                <th class="border  py-2 ">Amenity</th>
+                <th class="border  py-2 ">Road</th>
+                <th class="border  py-2 ">Suburb</th>
+                <th class="border  py-2 ">City</th>
+                <th class="border  py-2 ">statut</th> <!-- New statut Column -->
+
             </tr>
         </thead>
         <tbody>
@@ -105,25 +107,22 @@ $result = $connection->query($sql);
                     <td class="border p-2 "><?php echo $collecte['id']; ?></td>
                     <td class="border p-2 "><?php echo $collecte['localisation']; ?></td>
                     <td class="border p-2 "><?php echo date("Y-m-d H:i:s", strtotime($collecte['date_heure_prevue'])); ?></td>
-                    <td class="border p-2 "><?php echo $collecte['statut']; ?></td>
+                    <td class="border p-2 "><?php echo $collecte['camion']; ?></td>
                     <td class="border p-2 "><?php echo $collecte['amenity']; ?></td>
                     <td class="border p-2 "><?php echo $collecte['road']; ?></td>
                     <td class="border p-2 "><?php echo $collecte['suburb']; ?></td>
                     <td class="border p-2 "><?php echo $collecte['city']; ?></td>
-                    <td class="border p-2 ">
-                        <form action="SuiviDechetAdmin?action=suppression" method="post">
-                            <input type="hidden" name="idSuivi" value="<?php echo $collecte['id']; ?>">
-                            <button type="submit" class="bg-red-500 text-white p-2 rounded-md">Supprimer</button>
-                        </form>
-                    </td>
+                    <td class="border p-2"><?php echo $collecte['statut']; ?></td> <!-- Display statut -->
                 </tr>
             <?php } ?>
         </tbody>
     </table>
 
     <!-- Formulaire pour l'ajout -->
-    <h2 class="text-2xl font-bold mb-4 text-green-700 text-center">Ajouter un Suivi</h2>
+    <h2 class="text-2xl font-bold mb-4 text-blue-500 text-center">Ajouter un Suivi</h2>
     <form action="?action=ajout" method="post" class="max-w-2xl mx-auto bg-white p-8 rounded-md shadow-2xl">
+    <div id="map" class="mb-4"></div>
+
         <div class="mb-4">
             <label for="latitude" class="block text-sm font-medium text-gray-600">Latitude:</label>
             <input type="text" name="latitude" id="latitude" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
@@ -139,16 +138,15 @@ $result = $connection->query($sql);
         </div>
 
         <!-- Map Container -->
-        <div id="map" class="mb-4"></div>
 
         <div class="mb-4">
-            <label for="statut" class="block text-sm font-medium text-gray-600">Statut:</label>
-            <select id="statut" name="statut" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
-                <option value="Camion1">Camion 1</option>
-                <option value="Camion2">Camion 2</option>
-                <option value="Camion3">Camion 3</option>
-                <option value="Camion4">Camion 4</option>
-                <option value="Camion5">Camion 5</option>
+            <label for="camion" class="block text-sm font-medium text-gray-600">camion:</label>
+            <select id="camion" name="camion" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
+                <option value="camion1">camion 1</option>
+                <option value="camion2">camion 2</option>
+                <option value="camion3">camion 3</option>
+                <option value="camion4">camion 4</option>
+                <option value="camion5">camion 5</option>
             </select>
         </div>
 
@@ -171,7 +169,14 @@ $result = $connection->query($sql);
             <label for="suburb" class="block text-sm font-medium text-gray-600">Suburb:</label>
             <input type="text" name="suburb" id="suburb" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
         </div>
-
+        <div class="mb-4">
+            <label for="statut" class="block text-sm font-medium text-gray-600">statut:</label>
+            <select id="statut" name="statut" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
         <div class="mb-4">
             <label for="city" class="block text-sm font-medium text-gray-600">City:</label>
             <input type="text" name="city" id="city" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">

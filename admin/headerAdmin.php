@@ -13,14 +13,14 @@ session_start();
 <body class="font-sans bg-gray-100">
 
 <!-- Navbar -->
-<nav class="bg-green-500 p-2">
+<nav class="bg-blue-400 p-2">
     <div class="container mx-auto flex items-center justify-between">
         <!-- Logo à gauche -->
         <a class="text-white font-mono" href="./">Ville intelligent <strong class="text-red-800">(Admin)</strong></a>
         
         <!-- Liens de navigation au centre -->
         <div class="flex">
-            <a class="text-white ml-4" href="/ssmartcity/user/index.php">Accueil</a>
+            <a class="text-white ml-4" href="success.php">Accueil</a>
             <a class="text-white ml-4" href="ajoutTerrain.php">Ajouter Terrain</a>
             <a class="text-white ml-4" href="addPlaceTouristique.php">Place Touristique</a>
             <a class="text-white ml-4" href="suiviDechetAdmin.php">Suivi des déchets</a>

@@ -40,16 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="font-sans bg-gray-100">
 
     <div class="container mx-auto p-4">
-        <h1 class="text-4xl font-bold mb-8 text-purple-700 text-center">Ajout de Terrain</h1>
+        <h1 class="text-4xl font-bold mb-8 text-blue-500 text-center">Ajout de Terrain</h1>
         <form action="" method="post" enctype="multipart/form-data" class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
 
             <div class="mb-4">
                 <label for="nom" class="block text-sm font-medium text-gray-600">Nom du terrain:</label>
                 <select id="nom" name="nom" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
-                    <option value="Terrain Mabrouka">3ahira bzol </option>
-                    <option value="Terrain Marrakech">3ahira trom</option>
-                    <option value="Terrain Casablanca">3ahira 1/4 1/4</option>
-                    <option value="Terrain Fes">3ahira 1/5 1/5</option>
                     <option value="Terrain Agadir">Terrain Agadir</option>
                     <option value="Terrain Tanger">Terrain Tanger</option>
                     <option value="Terrain Rabat">Terrain Rabat</option>
@@ -75,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="flex items-center justify-center mt-6">
-                <button type="submit" class="bg-purple-500 text-white p-2 rounded-md shadow-2xl w-1/3">Ajouter</button>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded-md shadow-2xl w-1/3">Ajouter</button>
             </div>
 
         </form>
