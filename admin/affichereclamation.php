@@ -1,5 +1,4 @@
 <?php 
-
 include_once 'headerAdmin.php';
 include_once '../admin/ConnectionSingleton.php'; 
 
@@ -14,8 +13,28 @@ if ($connection->connect_error) {
     die("Connection failed: " . $connection->connect_error);
 }
 
+// Handle delete request
+if (isset($_POST['delete'])) {
+    $idToDelete = $_POST['delete'];
+    $deleteSql = "DELETE FROM signalements WHERE id = ?";
+    $stmt = $connection->prepare($deleteSql);
+    $stmt->bind_param('i', $idToDelete);
+    $stmt->execute();
+    $stmt->close();
+}
+
+// Handle email sending status update
+if (isset($_POST['reclamation_id'])) {
+    $reclamationId = $_POST['reclamation_id'];
+    $updateSql = "UPDATE signalements SET email_sent = 1 WHERE id = ?";
+    $stmt = $connection->prepare($updateSql);
+    $stmt->bind_param('i', $reclamationId);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // Prepare SQL query to filter based on the search input
-$sql = "SELECT `description`, `latitude`, `longitude`, `localisation`, `typeReclamation`, `photo`, `prenom`, `nom`, `telephone` 
+$sql = "SELECT `id`, `description`, `latitude`, `longitude`, `localisation`, `typeReclamation`, `photo`, `prenom`, `nom`, `telephone`, `email`, `email_sent` 
         FROM signalements 
         WHERE `typeReclamation` LIKE '%" . $connection->real_escape_string($search) . "%'"; // Escape the search input to prevent SQL injection
 
@@ -50,9 +69,11 @@ $connection->close();
     <h2 class="text-3xl font-bold mb-4 text-blue-500 text-center">Réclamations</h2>
 
     <div class="mb-4 flex max-w-full mx-auto">
-        <input type="text" name="search" placeholder="Rechercher..." 
-               class="flex-1 py-3 px-4 border-2 border-blue-500 rounded-l-lg focus:outline-none focus:border-purple-700 transition duration-300" value="<?php echo htmlspecialchars($search); ?>">
-        <button type="submit" class="bg-blue-500 text-white font-bold py-3 px-6 rounded-r-lg hover:bg-purple-800 transition duration-300">Rechercher</button>
+        <form method="post" class="flex w-full">
+            <input type="text" name="search" placeholder="Rechercher..." 
+                   class="flex-1 py-3 px-4 border-2 border-blue-500 rounded-l-lg focus:outline-none focus:border-purple-700 transition duration-300" value="<?php echo htmlspecialchars($search); ?>">
+            <button type="submit" class="bg-blue-500 text-white font-bold py-3 px-6 rounded-r-lg hover:bg-purple-800 transition duration-300">Rechercher</button>
+        </form>
     </div>
 
     <div id="map" class="max-w-full mx-auto mb-4 border-2 border-blue-500 rounded-lg shadow-lg" style="height: 400px;"></div>
@@ -77,6 +98,23 @@ $connection->close();
                         <p class="text-gray-700 mb-1">
                             <span class="text-blue-500 font-bold">Téléphone:</span> <?php echo htmlspecialchars($signalement['telephone']); ?>
                         </p>
+                        <p class="text-gray-700 mb-1">
+                            <span class="text-blue-500 font-bold">Email:</span> <?php echo htmlspecialchars($signalement['email']); ?>
+                        </p>
+                        <p class="text-gray-700 mb-1">
+                            <span class="text-blue-500 font-bold">Statut de l'email:</span> 
+                            <?php echo $signalement['email_sent'] ? 'Email envoyé' : 'Email non envoyé'; ?>
+                        </p>
+                        <div class="mt-4 flex space-x-2 justify-center"> <!-- Flex container for buttons -->
+                            <form method="post" class="w-1/2"> <!-- Half width for delete button -->
+                                <input type="hidden" name="delete" value="<?php echo htmlspecialchars($signalement['id']); ?>">
+                                <button type="submit" class="bg-red-500 text-white font-bold py-2 w-full rounded hover:bg-red-700 transition duration-300">Supprimer</button>
+                            </form>
+                            <form method="post" action="emailreclamation.php" class="w-1/2"> <!-- Half width for send button -->
+                                <input type="hidden" name="reclamation_id" value="<?php echo htmlspecialchars($signalement['id']); ?>">
+                                <button type="submit" class="bg-green-500 text-white font-bold py-2 w-full rounded hover:bg-green-700 transition duration-300">Envoyer</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -111,7 +149,7 @@ $connection->close();
             const doc = new jsPDF();
             const pageHeight = doc.internal.pageSize.height; // Get page height
             let y = 30; // Starting y position for the first reclamation
-            let reclamationHeight = 40; // Estimated height of each reclamation section
+            let reclamationHeight = 50; // Estimated height of each reclamation section
 
             // Title
             doc.setFontSize(22);
@@ -121,57 +159,19 @@ $connection->close();
             <?php foreach ($signalements as $signalement) : ?>
                 // Check if y position is too low, if so, add a new page
                 if (y + reclamationHeight > pageHeight) {
-                    doc.addPage();
-                    y = 20; // Reset y position for the new page
+                    doc.addPage(); // Add new page
+                    y = 30; // Reset y position
                 }
-
-                // Add Type
-                doc.setFontSize(14);
-                doc.text("Type: <?php echo addslashes($signalement['typeReclamation']); ?>", 10, y);
-                y += 10;
-
-                // Add Description
                 doc.setFontSize(12);
-                doc.text("Description:", 10, y);
+                doc.text("Description: <?php echo addslashes($signalement['description']); ?>", 14, y);
                 y += 10;
-
-                var description = "<?php echo addslashes($signalement['description']); ?>";
-                var lines = doc.splitTextToSize(description, 190); // Wrap text to fit in the PDF
-                doc.text(lines, 10, y);
-                y += lines.length * 10; // Adjust y based on the number of lines
-
-                // Add Localisation
-                var address = "<?php echo addslashes($signalement['localisation']); ?>";
-                var addressLines = doc.splitTextToSize(address, 190); // Wrap address to fit in the PDF
-                doc.text("Localisation:", 10, y);
-                y += 10;
-                doc.text(addressLines, 10, y);
-                y += addressLines.length * 10; // Adjust y based on the number of lines
-
-                // Add Name
-                doc.text("Nom: <?php echo addslashes($signalement['prenom']) . ' ' . addslashes($signalement['nom']); ?>", 10, y);
-                y += 10;
-
-                // Add Phone
-                doc.text("Téléphone: <?php echo addslashes($signalement['telephone']); ?>", 10, y);
-                y += 10;
-
-                // Draw a horizontal line for separation
-                doc.setDrawColor(0); // Set the color of the line (black)
-                doc.line(10, y, 200, y); // Draw the line from (10, y) to (200, y)
-                y += 5; // Add space after the line
-
-                // Additional space between entries
-                y += 10;
+                doc.text("Type: <?php echo addslashes($signalement['typeReclamation']); ?>", 14, y);
+                y += 20; // Add space for the next reclamation
             <?php endforeach; ?>
 
             // Save the PDF
-            doc.save("reclamations.pdf"); // Name of the generated PDF
+            doc.save("reclamations.pdf");
         }
     </script>
-
-<?php
-include_once 'footerAdmin.php';
-?>
 </body>
 </html>

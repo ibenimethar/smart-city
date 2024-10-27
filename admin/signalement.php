@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Connection failed: " . $connection->connect_error);
     }
 
+  
     // Collect form data
     $description = $_POST['description'];
     $latitude = $_POST['latitude'];
@@ -25,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prenom = $_POST['prenom'];
     $nom = $_POST['nom'];
     $telephone = $_POST['telephone'];
+    $email = $_POST['email']; // Collect the email address
     $localisation = $_POST['localisation']; // Collect the generated address
     $typeReclamation = $_POST['typeReclamation'];
     $photo = $_FILES['photo']['name']; // Get the uploaded file name
@@ -34,24 +36,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Move the uploaded file to the target directory
     if (move_uploaded_file($tempname, $targetFile)) {
-   // Prepare the SQL statement
-$stmt = $connection->prepare("INSERT INTO signalements 
-(`description`, `latitude`, `longitude`, `localisation`, `typeReclamation`, `photo`, `prenom`, `nom`, `telephone`) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // Prepare the SQL statement
+        $stmt = $connection->prepare("INSERT INTO signalements 
+        (`description`, `latitude`, `longitude`, `localisation`, `typeReclamation`, `photo`, `prenom`, `nom`, `telephone`, `email`) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-// Make sure to use the correct data types in bind_param
-$stmt->bind_param("sddssssss", 
-$description, 
-$latitude, 
-$longitude, 
-$localisation, 
-$typeReclamation, 
-$targetFile, 
-$prenom, 
-$nom, 
-$telephone
-);
-
+        // Make sure to use the correct data types in bind_param
+        $stmt->bind_param("sddsssssss", 
+        $description, 
+        $latitude, 
+        $longitude, 
+        $localisation, 
+        $typeReclamation, 
+        $targetFile, 
+        $prenom, 
+        $nom, 
+        $telephone,
+        $email // Bind the email address
+        );
 
         if ($stmt->execute()) {
             // Redirect to the same page after successful submission
@@ -103,6 +105,13 @@ $telephone
         <label for="telephone" class="block text-sm font-medium text-gray-600">Numéro de téléphone :</label>
         <input type="text" name="telephone" id="telephone" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
     </div>
+
+<!-- Champ pour l'adresse email -->
+<div class="mb-4">
+    <label for="email" class="block text-sm font-medium text-gray-600">Email :</label>
+    <input type="email" name="email" id="email" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
+</div>
+
         <div class="mb-4">
             <label for="description" class="block text-sm font-medium text-gray-600">Description:</label>
             <textarea name="description" rows="5" cols="50" maxlength="340" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" 
