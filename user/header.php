@@ -1,4 +1,3 @@
-<!-- header.jsp -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,7 +8,6 @@
 </head>
 <body class="font-sans bg-gray-100">
 
-<!-- Navbar -->
 <nav class="bg-purple-400 p-3">
     <div class="container mx-auto flex items-center justify-between">
         <a class="text-white font-mono" href="/ssmartcity/">Ville Intelligent</a>
@@ -21,7 +19,7 @@
             <a class="text-white ml-4" href="../admin/displayPlacesTouristiques.php">Lieux touristiques</a>
             <a class="text-white ml-4" href="/ssmartcity/admin/visualisationPatrimoine.php">Patrimoine</a>
         </div>
-        <div class="flex-shrink">
+        <div >
             <a class="text-white ml-4 border rounded-md p-1 px-4 hover:bg-white hover:text-purple-400" href="/ssmartcity/admin/auth.php">Login</a>
         </div>
     </div>
@@ -29,5 +27,4 @@
 
 
 
-<!-- Content -->
 <div class="container mt-4 mx-auto">

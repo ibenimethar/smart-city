@@ -1,13 +1,12 @@
 <?php
 include_once 'headerAdmin.php';
-include_once '../admin/ConnectionSingleton.php'; // Include your database connection
+include_once '../admin/ConnectionSingleton.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '../vendor/autoload.php'; // Adjust path as necessary
+require '../vendor/autoload.php';
 
-// Handle deletion of a reservation
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
     $reservationId = $_POST['delete_id'];
 
@@ -24,11 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
     $stmt->close();
 }
 
-// Handle acceptance of a reservation
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['accept_id'])) {
     $reservationId = $_POST['accept_id'];
 
-    // Fetch reservation details
     $sql = "SELECT * FROM reservations WHERE id = ?";
     $stmt = $connection->prepare($sql);
     $stmt->bind_param("i", $reservationId);
@@ -37,30 +34,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['accept_id'])) {
     $reservation = $result->fetch_assoc();
     $stmt->close();
 
-    // Update reservation status
     $updateSql = "UPDATE reservations SET status = 'terrain réservé' WHERE id = ?";
     $updateStmt = $connection->prepare($updateSql);
     $updateStmt->bind_param("i", $reservationId);
 
     if ($updateStmt->execute()) {
-        // Send confirmation email
         $mail = new PHPMailer(true);
         try {
-            // Server settings
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com'; // Set the SMTP server to send through
-            $mail->SMTPAuth   = true; // Enable SMTP authentication
-            $mail->Username   = 'bnimatharinsaf2021wxc@gmail.com'; // SMTP username
-            $mail->Password   = 'dkdb gwzi revn bxoj'; // SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
-            $mail->Port       = 587; // TCP port to connect to
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'bnimatharinsaf2021wxc@gmail.com';
+            $mail->Password   = 'dkdb gwzi revn bxoj';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = 587;
 
-            // Recipients
             $mail->setFrom('bnimatharinsaf2021wxc@gmail.com', 'Admin');
-            $mail->addAddress($reservation['emailReservant']); // User email from reservation
+            $mail->addAddress($reservation['emailReservant']);
 
-            // Content
-            $mail->isHTML(true); // Set email format to HTML
+            $mail->isHTML(true);
             $mail->Subject = 'Reservation Confirmation';
             $mail->Body    = "Hello " . htmlspecialchars($reservation['nomReservant']) . ",<br><br>Your reservation has been accepted. Details:<br>
                                 Terrain Name: " . htmlspecialchars($reservation['nomTerrain']) . "<br>
@@ -80,23 +72,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['accept_id'])) {
     $updateStmt->close();
 }
 
-// Fetch all reservations from the database
 $reservations = [];
 $sql = "SELECT * FROM reservations ORDER BY dateDebut ASC";
 $result = $connection->query($sql);
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        // Check if the reservation period is finished and update the status if necessary
         $today = date('Y-m-d');
         if ($row['dateFin'] < $today && $row['status'] != 'periode terminée') {
-            // Update the status to 'periode terminée'
             $updateSql = "UPDATE reservations SET status = 'periode terminée' WHERE id = ?";
             $updateStmt = $connection->prepare($updateSql);
             $updateStmt->bind_param("i", $row['id']);
             $updateStmt->execute();
             $updateStmt->close();
-            $row['status'] = 'periode terminée'; // Update local array to reflect the change
+            $row['status'] = 'periode terminée';
         }
 
         $reservations[] = $row;
@@ -112,7 +101,6 @@ if ($result) {
     <title>Toutes les Réservations</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Prevent text wrapping in table headers */
         .no-wrap {
             white-space: nowrap;
         }
@@ -150,7 +138,7 @@ if ($result) {
                     <th class="py-2 px-4 border-b no-wrap">Reservant Name</th>
                     <th class="py-2 px-4 border-b no-wrap">Phone Number</th>
                     <th class="py-2 px-4 border-b no-wrap">Email</th>
-                    <th class="py-2 px-4 border-b no-wrap">Status</th> <!-- New status column -->
+                    <th class="py-2 px-4 border-b no-wrap">Status</th>
                     <th class="py-2 px-4 border-b no-wrap">Actions</th>
                 </tr>
             </thead>
@@ -165,7 +153,7 @@ if ($result) {
                             <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($reservation['nomReservant']); ?></td>
                             <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($reservation['numeroTel']); ?></td>
                             <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($reservation['emailReservant']); ?></td>
-                            <td class="py-2 px-2 border-b no-wrap " ><?php echo htmlspecialchars($reservation['status']); ?></td> <!-- Display the status -->
+                            <td class="py-2 px-2 border-b no-wrap " ><?php echo htmlspecialchars($reservation['status']); ?></td>
                             <td class="py-2 px-4 border-b">
                                 <div class="flex space-x-2">
                                     <form action="" method="POST" onsubmit="return confirmDelete();">
@@ -190,10 +178,8 @@ if ($result) {
     </div>
 </body>
 </html>
-<?php
-// Include the footer file
-include_once 'footerAdmin.php';
 
-// Close the connection
+<?php
+include_once 'footerAdmin.php';
 $connection->close();
 ?>

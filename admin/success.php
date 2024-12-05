@@ -73,6 +73,5 @@ include_once 'headerAdmin.php';
 </html>
 
 <?php
-// Include the footer file
 include_once 'footerAdmin.php';
 ?>

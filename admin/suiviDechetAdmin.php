@@ -1,5 +1,4 @@
 <?php
-// Include the header file
 include_once 'headerAdmin.php';
 
 $host = 'localhost';
@@ -7,19 +6,15 @@ $dbname = 'smartcity';
 $db_username = 'root'; 
 $db_password = ''; 
 
-// Create a new connection using MySQLi
 $connection = new mysqli($host, $db_username, $db_password, $dbname);
 
-// Check for connection errors
 if ($connection->connect_error) {
     die("Connection failed: " . $connection->connect_error);
 }
 
-$message = ''; // Initialize message variable
+$message = ''; 
 
-// Handle form submission for adding a new record
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action']) && $_GET['action'] == 'ajout') {
-    // Validate that all required POST data is set
     if (isset($_POST['latitude'], $_POST['longitude'], $_POST['dateHeurePrevue'], $_POST['camion'], $_POST['amenity'], $_POST['road'], $_POST['suburb'], $_POST['city'])) {
         $latitude = mysqli_real_escape_string($connection, $_POST['latitude']);
         $longitude = mysqli_real_escape_string($connection, $_POST['longitude']);
@@ -32,18 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action']) && $_GET['act
         $localisation = mysqli_real_escape_string($connection, $_POST['localisation']);
         $statut = mysqli_real_escape_string($connection, $_POST['statut']);
 
-        // Prepare the insert SQL statement
         $sql = "INSERT INTO suivi_dechets (`latitude`, `longitude`, `date_heure_prevue`, `camion`, `amenity`, `road`, `suburb`, `city`, `localisation`, `statut`) VALUES ('$latitude', '$longitude', '$dateHeurePrevue', '$camion', '$amenity', '$road', '$suburb', '$city', '$localisation', '$statut')";
         
-        // Execute the insert SQL query
         if ($connection->query($sql) === TRUE) {
-            // Set success message
             $message = '<p class="text-green-600">Suivi ajouté avec succès!</p>';
-            // Redirect to avoid form resubmission
             header("Location: SuiviDechetAdmin.php");
             exit();
         } else {
-            error_log("MySQL Error: " . $connection->error); // Log error for debugging
+            error_log("MySQL Error: " . $connection->error); 
             $message = '<p class="text-red-600">Erreur lors de l\'ajout: ' . $connection->error . '</p>';
         }
     } else {
@@ -51,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action']) && $_GET['act
     }
 }
 
-// Fetch existing records
 $sql = "SELECT * FROM suivi_dechets";
 $result = $connection->query($sql);
 ?>
@@ -72,10 +62,8 @@ $result = $connection->query($sql);
 <body class="bg-gray-100 p-8">
     <h1 class="text-4xl font-bold mb-8 text-blue-500 text-center">Suivi Des Déchets - Admin</h1>
 
-    <!-- Message display -->
     <div class="mb-4 text-center">
         <?php 
-        // Display success message if action is successful
         if (isset($_GET['success'])) {
             echo '<p class="text-green-600">Suivi ajouté avec succès!</p>';
         }
@@ -85,7 +73,6 @@ $result = $connection->query($sql);
 
 
 
-    <!-- Tableau pour afficher les champs existants -->
     <table class="border-collapse w-full mb-8">
         <thead>
             <tr class="bg-gray-200">
@@ -97,7 +84,7 @@ $result = $connection->query($sql);
                 <th class="border  py-2 ">Road</th>
                 <th class="border  py-2 ">Suburb</th>
                 <th class="border  py-2 ">City</th>
-                <th class="border  py-2 ">statut</th> <!-- New statut Column -->
+                <th class="border  py-2 ">statut</th> 
 
             </tr>
         </thead>
@@ -112,13 +99,12 @@ $result = $connection->query($sql);
                     <td class="border p-2 "><?php echo $collecte['road']; ?></td>
                     <td class="border p-2 "><?php echo $collecte['suburb']; ?></td>
                     <td class="border p-2 "><?php echo $collecte['city']; ?></td>
-                    <td class="border p-2"><?php echo $collecte['statut']; ?></td> <!-- Display statut -->
+                    <td class="border p-2"><?php echo $collecte['statut']; ?></td> 
                 </tr>
             <?php } ?>
         </tbody>
     </table>
 
-    <!-- Formulaire pour l'ajout -->
     <h2 class="text-2xl font-bold mb-4 text-blue-500 text-center">Ajouter un Suivi</h2>
     <form action="?action=ajout" method="post" class="max-w-2xl mx-auto bg-white p-8 rounded-md shadow-2xl">
     <div id="map" class="mb-4"></div>
@@ -137,7 +123,6 @@ $result = $connection->query($sql);
             <input type="text" name="localisation" id="localisation" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" readonly>
         </div>
 
-        <!-- Map Container -->
 
         <div class="mb-4">
             <label for="camion" class="block text-sm font-medium text-gray-600">camion:</label>
@@ -187,7 +172,6 @@ $result = $connection->query($sql);
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        // Initialize the map
         var map = L.map('map').setView([34.020882, -6.840668], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -199,18 +183,15 @@ $result = $connection->query($sql);
             var lat = e.latlng.lat;
             var lng = e.latlng.lng;
 
-            // Update the marker position
             marker.setLatLng([lat, lng]);
 
-            // Fill the inputs with coordinates
             document.getElementById('latitude').value = lat;
             document.getElementById('longitude').value = lng;
 
-            // Fetch the address
             fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('localisation').value = data.display_name; // Fill address input
+                    document.getElementById('localisation').value = data.display_name; 
                 })
                 .catch(err => console.error(err));
         });

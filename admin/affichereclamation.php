@@ -2,18 +2,14 @@
 include_once 'headerAdmin.php';
 include_once '../admin/ConnectionSingleton.php'; 
 
-// Initialize search variable
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 
-// Create the database connection
 $connection = new mysqli('localhost', 'root', '', 'smartcity');
 
-// Check connection
 if ($connection->connect_error) {
     die("Connection failed: " . $connection->connect_error);
 }
 
-// Handle delete request
 if (isset($_POST['delete'])) {
     $idToDelete = $_POST['delete'];
     $deleteSql = "DELETE FROM signalements WHERE id = ?";
@@ -23,7 +19,6 @@ if (isset($_POST['delete'])) {
     $stmt->close();
 }
 
-// Handle email sending status update
 if (isset($_POST['reclamation_id'])) {
     $reclamationId = $_POST['reclamation_id'];
     $updateSql = "UPDATE signalements SET email_sent = 1 WHERE id = ?";
@@ -33,24 +28,21 @@ if (isset($_POST['reclamation_id'])) {
     $stmt->close();
 }
 
-// Prepare SQL query to filter based on the search input
 $sql = "SELECT `id`, `description`, `latitude`, `longitude`, `localisation`, `typeReclamation`, `photo`, `prenom`, `nom`, `telephone`, `email`, `email_sent` 
         FROM signalements 
-        WHERE `typeReclamation` LIKE '%" . $connection->real_escape_string($search) . "%'"; // Escape the search input to prevent SQL injection
+        WHERE `typeReclamation` LIKE '%" . $connection->real_escape_string($search) . "%'";
 
 $result = $connection->query($sql);
 $signalements = [];
 
-// Check if the query was successful
 if ($result) {
-    // Fetch results if available
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $signalements[] = $row;
         }
     }
 } else {
-    echo "Error: " . $connection->error; // Debugging line to show SQL errors
+    echo "Error: " . $connection->error;
 }
 
 $connection->close();
@@ -105,12 +97,12 @@ $connection->close();
                             <span class="text-blue-500 font-bold">Statut de l'email:</span> 
                             <?php echo $signalement['email_sent'] ? 'Email envoyé' : 'Email non envoyé'; ?>
                         </p>
-                        <div class="mt-4 flex space-x-2 justify-center"> <!-- Flex container for buttons -->
-                            <form method="post" class="w-1/2"> <!-- Half width for delete button -->
+                        <div class="mt-4 flex space-x-2 justify-center">
+                            <form method="post" class="w-1/2">
                                 <input type="hidden" name="delete" value="<?php echo htmlspecialchars($signalement['id']); ?>">
                                 <button type="submit" class="bg-red-500 text-white font-bold py-2 w-full rounded hover:bg-red-700 transition duration-300">Supprimer</button>
                             </form>
-                            <form method="post" action="emailreclamation.php" class="w-1/2"> <!-- Half width for send button -->
+                            <form method="post" action="emailreclamation.php" class="w-1/2">
                                 <input type="hidden" name="reclamation_id" value="<?php echo htmlspecialchars($signalement['id']); ?>">
                                 <button type="submit" class="bg-green-500 text-white font-bold py-2 w-full rounded hover:bg-green-700 transition duration-300">Envoyer</button>
                             </form>
@@ -145,31 +137,27 @@ $connection->close();
     
     <script>
         function generatePDF() {
-            const { jsPDF } = window.jspdf; // Using jsPDF library
+            const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const pageHeight = doc.internal.pageSize.height; // Get page height
-            let y = 30; // Starting y position for the first reclamation
-            let reclamationHeight = 50; // Estimated height of each reclamation section
+            const pageHeight = doc.internal.pageSize.height;
+            let y = 30;
+            let reclamationHeight = 50;
 
-            // Title
             doc.setFontSize(22);
             doc.text("Liste des Réclamations", 14, 22);
 
-            // Loop through the reclamations to add them to the PDF
             <?php foreach ($signalements as $signalement) : ?>
-                // Check if y position is too low, if so, add a new page
                 if (y + reclamationHeight > pageHeight) {
-                    doc.addPage(); // Add new page
-                    y = 30; // Reset y position
+                    doc.addPage();
+                    y = 30;
                 }
                 doc.setFontSize(12);
                 doc.text("Description: <?php echo addslashes($signalement['description']); ?>", 14, y);
                 y += 10;
                 doc.text("Type: <?php echo addslashes($signalement['typeReclamation']); ?>", 14, y);
-                y += 20; // Add space for the next reclamation
+                y += 20;
             <?php endforeach; ?>
 
-            // Save the PDF
             doc.save("reclamations.pdf");
         }
     </script>

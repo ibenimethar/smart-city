@@ -1,5 +1,4 @@
 <?php
-// Inclure le fichier d'en-tête
 include_once 'header.php';
 
 $host = 'localhost';
@@ -52,7 +51,7 @@ $result = $connection->query($sql);
     <tr class="border-t border-gray-300">
     <td class="border p-2"><?php echo isset($row['id']) ? $row['id'] : 'N/A'; ?></td>
     <td class=" border p-2 "><?php echo isset($row['localisation']) ? $row['localisation'] : 'N/A'; ?></td>
-    <td class="border p-2"><?php echo isset($row['date_heure_prevue']) ? $row['date_heure_prevue'] : 'N/A'; ?></td> <!-- Removed the extra space -->
+    <td class="border p-2"><?php echo isset($row['date_heure_prevue']) ? $row['date_heure_prevue'] : 'N/A'; ?></td>
     <td class="border p-2"><?php echo isset($row['camion']) ? $row['camion'] : 'N/A'; ?></td>
     <td class="border p-2"><?php echo isset($row['amenity']) ? $row['amenity'] : 'N/A'; ?></td>
     <td class="border p-2"><?php echo isset($row['road']) ? $row['road'] : 'N/A'; ?></td>

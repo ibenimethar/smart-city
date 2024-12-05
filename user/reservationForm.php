@@ -1,25 +1,21 @@
 <?php
 include_once 'header.php';
-include_once '../admin/ConnectionSingleton.php'; // Include your database connection
+include_once '../admin/ConnectionSingleton.php';
 
-// Fetch terrain details from the URL if they exist
 $idTerrain = $_GET['idTerrain'] ?? '';
 $nomTerrain = urldecode($_GET['nomTerrain'] ?? '');
 $message = '';
 
-// Processing form data when submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['action']) && $_POST['action'] === 'reserve') {
-        // Handle reservation creation
         $idTerrain = $_POST['idTerrain'] ?? '';
         $nomTerrain = $_POST['nomTerrain'] ?? '';
         $dateDebut = $_POST['dateDebut'] ?? '';
         $dateFin = $_POST['dateFin'] ?? '';
         $nomReservant = $_POST['nomReservant'] ?? '';
         $numeroTel = $_POST['numeroTel'] ?? '';
-        $emailReservant = $_POST['emailReservant'] ?? ''; // Updated field name
+        $emailReservant = $_POST['emailReservant'] ?? '';
 
-        // Check if the reservation already exists
         $checkStmt = $connection->prepare("SELECT COUNT(*) FROM reservations WHERE idTerrain = ? AND ((dateDebut BETWEEN ? AND ?) OR (dateFin BETWEEN ? AND ?))");
         $checkStmt->bind_param("issss", $idTerrain, $dateDebut, $dateFin, $dateDebut, $dateFin);
         $checkStmt->execute();
@@ -30,37 +26,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($exists > 0) {
             $message = "Une réservation existe déjà pour cette période. Veuillez choisir une autre date.";
         } else {
-            // Prepare an SQL statement to prevent SQL injection
             $stmt = $connection->prepare("INSERT INTO reservations (idTerrain, nomTerrain, dateDebut, dateFin, nomReservant, numeroTel, emailReservant) VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-            // Bind parameters
             $stmt->bind_param("issssss", $idTerrain, $nomTerrain, $dateDebut, $dateFin, $nomReservant, $numeroTel, $emailReservant);
 
-            // Execute the statement
             if ($stmt->execute()) {
                 $message = "Réservation réussie pour : $nomReservant pour le terrain $nomTerrain (ID: $idTerrain) du $dateDebut au $dateFin.";
             } else {
                 $message = "Erreur : " . $stmt->error;
             }
 
-            $stmt->close(); // Close the prepared statement
+            $stmt->close();
         }
     } elseif (isset($_POST['action']) && $_POST['action'] === 'cancel') {
-        // Handle cancellation
         $idTerrain = $_POST['idTerrain'] ?? '';
-        
-        // Prepare an SQL statement to delete the reservation
         $stmt = $connection->prepare("DELETE FROM reservations WHERE idTerrain = ?");
         $stmt->bind_param("i", $idTerrain);
 
-        // Execute the statement and check for success
         if ($stmt->execute()) {
             $message = "Réservation annulée avec succès.";
         } else {
             $message = "Erreur lors de l'annulation de la réservation : " . $stmt->error;
         }
 
-        $stmt->close(); // Close the prepared statement
+        $stmt->close();
     }
 }
 ?>
@@ -82,43 +70,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
 
         <form action="" method="post" class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
-            <!-- Terrain ID field -->
             <div class="mb-4">
                 <label for="idTerrain" class="block text-sm font-medium text-gray-600">ID du Terrain :</label>
                 <input type="text" id="idTerrain" name="idTerrain" value="<?php echo htmlspecialchars($idTerrain); ?>" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" readonly>
             </div>
 
-            <!-- Terrain Name field -->
             <div class="mb-4">
                 <label for="nomTerrain" class="block text-sm font-medium text-gray-600">Nom du Terrain :</label>
                 <input type="text" id="nomTerrain" name="nomTerrain" value="<?php echo htmlspecialchars($nomTerrain); ?>" required class="mt-1 p-2 border border-gray-300 rounded-md w-full" readonly>
             </div>
 
-            <!-- Start Date field -->
             <div class="mb-4">
                 <label for="dateDebut" class="block text-sm font-medium text-gray-600">Date de Début :</label>
                 <input type="datetime-local" id="dateDebut" name="dateDebut" value="<?php echo htmlspecialchars($dateDebut ?? ''); ?>" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
             </div>
 
-            <!-- End Date field -->
             <div class="mb-4">
                 <label for="dateFin" class="block text-sm font-medium text-gray-600">Date de Fin :</label>
                 <input type="datetime-local" id="dateFin" name="dateFin" value="<?php echo htmlspecialchars($dateFin ?? ''); ?>" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
             </div>
 
-            <!-- Reservant Name field -->
             <div class="mb-4">
                 <label for="nomReservant" class="block text-sm font-medium text-gray-600">Nom du Réservant :</label>
                 <input type="text" id="nomReservant" name="nomReservant" value="<?php echo htmlspecialchars($nomReservant ?? ''); ?>" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
             </div>
 
-            <!-- Phone Number field -->
             <div class="mb-4">
                 <label for="numeroTel" class="block text-sm font-medium text-gray-600">Numéro de Téléphone :</label>
                 <input type="text" id="numeroTel" name="numeroTel" value="<?php echo htmlspecialchars($numeroTel ?? ''); ?>" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
             </div>
 
-            <!-- Email field -->
             <div class="mb-4">
                 <label for="emailReservant" class="block text-sm font-medium text-gray-600">Email :</label>
                 <input type="email" id="emailReservant" name="emailReservant" value="<?php echo htmlspecialchars($emailReservant ?? ''); ?>" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
@@ -137,5 +118,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php
 include_once 'footer.php'; 
 
-$connection->close(); // Close the database connection
+$connection->close();
 ?>

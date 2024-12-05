@@ -1,16 +1,14 @@
 <?php
-// Include the header file
-include_once '../user/header.php'; // Adjust path as necessary
+include_once '../user/header.php';
 include_once '../admin/ConnectionSingleton.php'; 
 
-// Fetch terrains from the database
 $sql = "SELECT * FROM terrains";
 $result = $connection->query($sql);
 
 $terrainsDisponibles = [];
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $terrainsDisponibles[] = $row; // Store each terrain in the array
+        $terrainsDisponibles[] = $row;
     }
 }
 ?>
@@ -37,8 +35,6 @@ if ($result->num_rows > 0) {
                             <p class="text-gray-700 mb-2"><strong>Description:</strong> <?= $terrain['description'] ?></p>
                             <p class="text-gray-700 mb-2"><strong>Disponibilité:</strong> <?= $terrain['disponibilite'] ? 'Disponible' : 'Indisponible' ?></p>
                             <a href="../user/reservationForm.php?idTerrain=<?= $terrain['id'] ?>&nomTerrain=<?= urlencode($terrain['nom']) ?>" class="bg-purple-500 text-white p-2 rounded-md shadow-2xl inline-block">Réserver</a>
-
-
                         </div>
                     </div>
                 <?php } ?>
@@ -52,7 +48,6 @@ if ($result->num_rows > 0) {
 </html>
 
 <?php
-// Include the footer file
 include_once '../user/footer.php';
-$connection->close(); // Close the database connection
+$connection->close();
 ?>

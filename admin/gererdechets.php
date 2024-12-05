@@ -1,5 +1,4 @@
 <?php
-// Include the header file
 include_once 'headerAdmin.php';
 
 $host = 'localhost';
@@ -7,24 +6,19 @@ $dbname = 'smartcity';
 $db_username = 'root'; 
 $db_password = ''; 
 
-// Create a new connection using MySQLi
 $connection = new mysqli($host, $db_username, $db_password, $dbname);
 
-// Check for connection errors
 if ($connection->connect_error) {
     die("Connection failed: " . $connection->connect_error);
 }
 
-$message = ''; // Initialize message variable
+$message = ''; 
 
-// Handle form submission for adding or editing a record
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $idSuivi = isset($_POST['idSuivi']) ? $_POST['idSuivi'] : null;
 
-    // Check if this is for deletion
     if (isset($_GET['action']) && $_GET['action'] == 'suppression') {
         if ($idSuivi) {
-            // Delete the record
             $sql = "DELETE FROM suivi_dechets WHERE id='$idSuivi'";
 
             if ($connection->query($sql) === TRUE) {
@@ -37,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $message = '<p class="text-red-600">Erreur : ID manquant pour la suppression.</p>';
         }
     } else {
-        // Handle adding or editing a record
         $latitude = isset($_POST['latitude']) ? $_POST['latitude'] : null;
         $longitude = isset($_POST['longitude']) ? $_POST['longitude'] : null;
         $dateHeurePrevue = isset($_POST['dateHeurePrevue']) ? $_POST['dateHeurePrevue'] : null;
@@ -50,21 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $camion = isset($_POST['camion']) ? $_POST['camion'] : null;
         $newlocalisation = isset($_POST['newlocalisation']) ? $_POST['newlocalisation'] : null;
 
-        // Use newlocalisation if provided; otherwise, use localisation
         $finalLocalisation = !empty($newlocalisation) ? $newlocalisation : $localisation;
 
         if (isset($_GET['action']) && $_GET['action'] == 'ajout') {
-            // Insert new record
             $sql = "INSERT INTO suivi_dechets (latitude, longitude, date_heure_prevue, statut, amenity, road, suburb, city, localisation, camion, newlocation) 
                     VALUES ('$latitude', '$longitude', '$dateHeurePrevue', '$statut', '$amenity', '$road', '$suburb', '$city', '$finalLocalisation', '$camion', '$newlocalisation')";
         } elseif (isset($_GET['action']) && $_GET['action'] == 'edit') {
-            // Update existing record
             $sql = "UPDATE suivi_dechets SET latitude='$latitude', longitude='$longitude', date_heure_prevue='$dateHeurePrevue', 
                     statut='$statut', amenity='$amenity', road='$road', suburb='$suburb', city='$city', localisation='$finalLocalisation', camion='$camion' 
                     WHERE id='$idSuivi'";
         }
 
-        // Execute the SQL query
         if ($connection->query($sql) === TRUE) {
             $message = '<p class="text-green-600">Opération réussie!</p>';
         } else {
@@ -74,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Fetch existing records
 $sql = "SELECT * FROM suivi_dechets";
 $result = $connection->query($sql);
 ?>
@@ -94,12 +82,10 @@ $result = $connection->query($sql);
 <body class="bg-gray-100 p-8">
     <h1 class="text-4xl font-bold mb-8 text-blue-500 text-center">Suivi Des Déchets - Admin</h1>
 
-    <!-- Message display -->
     <div class="mb-4 text-center">
         <?php echo $message; ?>
     </div>
 
-    <!-- Table for displaying existing records -->
     <table class="border-collapse w-full mb-8">
         <thead>
             <tr class="bg-gray-200">
@@ -140,14 +126,12 @@ $result = $connection->query($sql);
     </table>
 
     <?php
-    // Handle edit action if needed
     if (isset($_GET['action']) && $_GET['action'] == 'edit' && isset($_GET['id'])) {
         $idSuivi = mysqli_real_escape_string($connection, $_GET['id']);
         $sqlEdit = "SELECT * FROM suivi_dechets WHERE id='$idSuivi'";
         $resultEdit = $connection->query($sqlEdit);
         $collecteEdit = $resultEdit->fetch_assoc();
     ?>
-        <!-- Form for editing a record -->
         <h2 class="text-2xl font-bold mb-4 text-blue-500 text-center">Modifier un Suivi</h2>
         <form method="POST" action="?action=edit" class="max-w-2xl mx-auto bg-white p-8 rounded-md shadow-2xl">
             <input type="hidden" name="idSuivi" value="<?php echo $collecteEdit['id']; ?>">
@@ -163,84 +147,23 @@ $result = $connection->query($sql);
                 <input type="text" name="localisation" placeholder="Localisation" value="<?php echo $collecteEdit['localisation']; ?>" class="border p-2 w-full">
             </div>
             <div class="mb-4">
-            <label for="localisation" class="block text-sm font-medium text-gray-600"> nouvelle Adresse:</label>
-            <input type="text" name="newlocalisation" id="newlocalisation"  class="mt-1 p-2 border border-gray-300 rounded-md w-full" readonly>
-        </div>
-            <div class="mb-4">
-                <input type="datetime-local" name="dateHeurePrevue" value="<?php echo date("Y-m-d\TH:i", strtotime($collecteEdit['date_heure_prevue'])); ?>" class="border p-2 w-full">
+                <label for="localisation" class="block text-sm font-medium text-gray-600"> nouvelle Adresse:</label>
+                <input type="text" name="newlocalisation" id="newlocalisation" class="mt-1 p-2 rounded-md border w-full" value="<?php echo $collecteEdit['newlocation']; ?>" />
             </div>
-            <div class="mb-4">
-                <select name="statut" class="border p-2 w-full">
-                    <option value="Prévu" <?php echo ($collecteEdit['statut'] == 'Prévu') ? 'selected' : ''; ?>>Prévu</option>
-                    <option value="Complété" <?php echo ($collecteEdit['statut'] == 'Complété') ? 'selected' : ''; ?>>Complété</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <input type="text" name="amenity" placeholder="Amenity" value="<?php echo $collecteEdit['amenity']; ?>" class="border p-2 w-full">
-            </div>
-            <div class="mb-4">
-                <input type="text" name="road" placeholder="Road" value="<?php echo $collecteEdit['road']; ?>" class="border p-2 w-full">
-            </div>
-            <div class="mb-4">
-                <input type="text" name="suburb" placeholder="Suburb" value="<?php echo $collecteEdit['suburb']; ?>" class="border p-2 w-full">
-            </div>
-            <div class="mb-4">
-                <input type="text" name="city" placeholder="City" value="<?php echo $collecteEdit['city']; ?>" class="border p-2 w-full">
-            </div>
-           
+
             <div class="mb-4">
                 <input type="text" name="camion" placeholder="Camion" value="<?php echo $collecteEdit['camion']; ?>" class="border p-2 w-full">
             </div>
-            <div class="text-center">
-                <button type="submit" class="bg-blue-500 text-white p-2 rounded">Mettre à jour</button>
+            <div class="mb-4">
+                <input type="text" name="statut" placeholder="Statut" value="<?php echo $collecteEdit['statut']; ?>" class="border p-2 w-full">
             </div>
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded-md w-full">Modifier</button>
         </form>
-    <?php }  ?>
-      
+    <?php } ?>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        var map = L.map('map').setView([34.020882, -6.840378], 13); // Default center of the map
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // Add a marker for the existing location if editing
-        var marker;
-        <?php if (isset($collecteEdit)) { ?>
-            marker = L.marker([<?php echo $collecteEdit['latitude']; ?>, <?php echo $collecteEdit['longitude']; ?>]).addTo(map);
-        <?php } else { ?>
-            marker = L.marker([34.020882, -6.840378]).addTo(map); // Default marker for adding new
-        <?php } ?>
-
-        // Update latitude and longitude fields when marker is dragged
-        marker.on('dragend', function(e) {
-            var position = e.target.getLatLng();
-            document.getElementById('latitude').value = position.lat;
-            document.getElementById('longitude').value = position.lng;
-        });
-
-        // Handle map clicks to set new location
-        map.on('click', function(e) {
-            var lat = e.latlng.lat;
-            var lng = e.latlng.lng;
-            marker.setLatLng(e.latlng);
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
-            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('newlocalisation').value = data.display_name; // Fill address input
-                })
-                .catch(err => console.error(err));
-        });
-    </script>
 </body>
 </html>
 
 <?php
-// Close the database connection
 $connection->close();
 ?>

@@ -16,30 +16,25 @@ if (isset($_GET['id'])) {
         $description = $_POST['description'];
         $ville = $_POST['ville'];
 
-        // Check if a new image file was uploaded
         if (!empty($_FILES['image']['name'])) {
-            $targetDir = "uploads/"; // Ensure this directory exists
+            $targetDir = "uploads/";
             $targetFile = $targetDir . basename($_FILES['image']['name']);
             $uploadOk = 1;
             $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-            // Check if image file is an actual image
             $check = getimagesize($_FILES['image']['tmp_name']);
             if ($check === false) {
                 echo "Le fichier n'est pas une image.";
                 $uploadOk = 0;
             }
 
-            // Allow only certain file formats
             if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
                 echo "Seuls les fichiers JPG, JPEG, PNG & GIF sont autorisés.";
                 $uploadOk = 0;
             }
 
-            // Check if $uploadOk is set to 0 by an error
             if ($uploadOk == 1) {
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
-                    // Update the image path in the database
                     $updateSql = "UPDATE places_touristiques SET nom = ?, description = ?, ville = ?, image = ? WHERE id = ?";
                     $updateStmt = $connection->prepare($updateSql);
                     $updateStmt->bind_param("ssssi", $nom, $description, $ville, $targetFile, $placeId);
@@ -49,7 +44,6 @@ if (isset($_GET['id'])) {
                 }
             }
         } else {
-            // Update without changing the image
             $updateSql = "UPDATE places_touristiques SET nom = ?, description = ?, ville = ? WHERE id = ?";
             $updateStmt = $connection->prepare($updateSql);
             $updateStmt->bind_param("sssi", $nom, $description, $ville, $placeId);
@@ -82,10 +76,9 @@ if (isset($_GET['id'])) {
 
         <div>
             <label class="block text-gray-700 font-semibold mb-2">Description:</label>
-            <textarea name="description"  rows="5" cols="50" maxlength="340" required
+            <textarea name="description" rows="5" cols="50" maxlength="340" required
                       class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-500"><?= htmlspecialchars($place['description']) ?></textarea>
         </div>
-      
 
         <div>
             <label class="block text-gray-700 font-semibold mb-2">Ville:</label>

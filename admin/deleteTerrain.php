@@ -7,6 +7,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $stmt = $connection->prepare($deleteSql);
     $stmt->bind_param("i", $terrainId);
     $stmt->execute();
+    
+
+    //
 
     header("Location: adminTerrains.php");
 }

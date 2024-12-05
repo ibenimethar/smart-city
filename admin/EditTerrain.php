@@ -16,30 +16,25 @@ if (isset($_GET['id'])) {
         $description = $_POST['description'];
         $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
 
-        // Check if a new image file was uploaded
         if (!empty($_FILES['image']['name'])) {
-            $targetDir = "uploads/"; // Make sure this directory exists
+            $targetDir = "uploads/"; 
             $targetFile = $targetDir . basename($_FILES['image']['name']);
             $uploadOk = 1;
             $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-            // Check if image file is an actual image
             $check = getimagesize($_FILES['image']['tmp_name']);
             if ($check === false) {
                 echo "File is not an image.";
                 $uploadOk = 0;
             }
 
-            // Allow only certain file formats
             if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
                 echo "Only JPG, JPEG, PNG & GIF files are allowed.";
                 $uploadOk = 0;
             }
 
-            // Check if $uploadOk is set to 0 by an error
             if ($uploadOk == 1) {
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
-                    // Update the image path in the database
                     $updateSql = "UPDATE terrains SET nom = ?, description = ?, disponibilite = ?, image = ? WHERE id = ?";
                     $updateStmt = $connection->prepare($updateSql);
                     $updateStmt->bind_param("ssisi", $nom, $description, $disponibilite, $targetFile, $terrainId);
@@ -49,7 +44,6 @@ if (isset($_GET['id'])) {
                 }
             }
         } else {
-            // Update without changing the image
             $updateSql = "UPDATE terrains SET nom = ?, description = ?, disponibilite = ? WHERE id = ?";
             $updateStmt = $connection->prepare($updateSql);
             $updateStmt->bind_param("ssii", $nom, $description, $disponibilite, $terrainId);
@@ -97,7 +91,6 @@ if (isset($_GET['id'])) {
             <?php if (!empty($terrain['image'])): ?>
                 <p class="mt-2">Image actuelle:</p>
                 <img src="<?= htmlspecialchars($terrain['image']) ?>" alt="Image du terrain" class="w-full h-48 object-cover rounded-md mt-2">
-
             <?php endif; ?>
         </div>
 

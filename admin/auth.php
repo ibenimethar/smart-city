@@ -1,48 +1,35 @@
 <?php
-// Include the header file
-include_once '../user/header.php'; // Adjust the path accordingly
-
+include_once '../user/header.php';
 include_once 'ConnectionSingleton.php';
-
-// Start the session
 session_start();
-
-// Initialize message variable
 $message = '';
 
-// Check if the request method is POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve login credentials from POST request
     if (empty($_POST['login']) || empty($_POST['pwd'])) {
-        $message = "Veuillez entrer votre nom d'utilisateur et votre mot de passe."; // Message when fields are empty
+        $message = "Veuillez entrer votre nom d'utilisateur et votre mot de passe.";
     } else {
         $login = htmlspecialchars($_POST['login']);
-        $pwd = $_POST['pwd']; // Hash the password
-
-        // Prepare the SQL statement
+        $pwd = $_POST['pwd'];
         $req = $connection->prepare("SELECT * FROM users WHERE login = ? AND password = ?");
         if ($req) {
-            $req->bind_param("ss", $login, $pwd); // Bind parameters
+            $req->bind_param("ss", $login, $pwd);
             $req->execute();
-            $result = $req->get_result(); // Get the result set from the prepared statement
-
-            // Check if the user exists
+            $result = $req->get_result();
             if ($result->num_rows === 1) {
-                $_SESSION['username'] = $login; // Store username in session
+                $_SESSION['username'] = $login;
                 header("Location:success.php"); 
                 exit();
             } else {
-                $message = "Identifiants incorrects"; // Error message for incorrect credentials
+                $message = "Identifiants incorrects";
             }
-            $req->close(); // Close the prepared statement
+            $req->close();
         } else {
-            $message = "Erreur lors de la préparation de la requête."; // Message for query preparation failure
+            $message = "Erreur lors de la préparation de la requête.";
         }
     }
 }
 
-// Close the connection
-$connection->close(); 
+$connection->close();
 ?>
 
 <!DOCTYPE html>
@@ -82,6 +69,5 @@ $connection->close();
 </html>
 
 <?php
-// Include the footer file
-include_once '../user/footer.php'; // Adjust the path accordingly
+include_once '../user/footer.php';
 ?>

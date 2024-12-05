@@ -1,28 +1,28 @@
 <?php
-// Include the header file
 include_once 'headerAdmin.php';
-include_once 'ConnectionSingleton.php'; // Assuming this file initializes your database connection
+include_once 'ConnectionSingleton.php'; 
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nom = $_POST['nom'];
     $description = $_POST['description'];
     $ville = $_POST['ville'];
     $image = $_FILES['image']['name'];
     $tempname = $_FILES['image']['tmp_name'];
-    $targetDir = "uploads/"; // Directory to store images
+    $targetDir = "uploads/"; 
     $targetFile = $targetDir . basename($image);
 
-    // Move the uploaded file to the target directory
     if (move_uploaded_file($tempname, $targetFile)) {
-        // Insert into database
-        $sql = "INSERT INTO places_touristiques (`nom`, `description`, `ville`, `image`) VALUES ('$nom', '$description', '$ville', '$targetFile')";
+        $stmt = $connection->prepare("INSERT INTO places_touristiques (`nom`, `description`, `ville`, `image`) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $nom, $description, $ville, $targetFile);
 
-        if ($connection->query($sql) === TRUE) {
-            echo "<div class='text-center text-green-500'>Place touristique ajoutée avec succès!</div>";
+        if ($stmt->execute()) {
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit; 
         } else {
-            echo "<div class='text-center text-red-500'>Erreur: " . $sql . "<br>" . $connection->error . "</div>";
+            echo "<div class='text-center text-red-500'>Erreur: " . $stmt->error . "</div>";
         }
+
+        $stmt->close();
     } else {
         echo "<div class='text-center text-red-500'>Erreur lors de l'upload de l'image.</div>";
     }
@@ -65,7 +65,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <option value="Tanger">Tanger</option>
                     <option value="Chefchaouen">Chefchaouen</option>
                     <option value="Ouarzazate">Ouarzazate</option>
-                    <!-- Ajoutez d'autres options selon vos besoins -->
                 </select>
             </div>
 
@@ -86,9 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </html>
 
 <?php
-// Include the footer file
+
 include_once 'footerAdmin.php';
 
-// Close the connection
 $connection->close();
 ?>

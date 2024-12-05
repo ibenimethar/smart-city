@@ -29,7 +29,8 @@ session_start();
 
         <!-- Bouton de déconnexion avec l'username à droite -->
         <div class="flex items-center">
-            <a class="text-white ml-4 border rounded-md p-1 px-4 hover:bg-white hover:text-purple-400" href="Logout">Déconnexion</a>
+            <a class="text-white ml-4 border rounded-md p-1 px-4 hover:bg-white hover:text-purple-400" href="logout.php">Déconnexion</a>
+
             <span class="text-white ml-2 text-xs font-mono">
                 <?php 
                 if (isset($_SESSION['username'])) {

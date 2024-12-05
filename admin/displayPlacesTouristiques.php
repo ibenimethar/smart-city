@@ -1,13 +1,10 @@
 <?php
-// Include the header file
-include_once '../user/header.php'; // Adjust path as necessary
+include_once '../user/header.php';
 include_once '../admin/ConnectionSingleton.php';
 
-// Fetch places touristiques from the database
 $query = "SELECT nom, description, ville, image FROM places_touristiques";
 $result = $connection->query($query);
 
-// Check if the query was successful
 if (!$result) {
     die("Query failed: " . $connection->error);
 }
@@ -26,9 +23,7 @@ if (!$result) {
         <h1 class="text-4xl font-mono text-purple-600 mb-8 col-span-full text-center border-b-8 border-blue py-6">Liste des Places Touristiques</h1>
 
         <?php
-        // Check if there are any places to display
         if ($result->num_rows > 0) {
-            // Fetch and display each place
             while ($placeTouristique = $result->fetch_assoc()) {
                 ?>
                 <div class="bg-white rounded-lg overflow-hidden shadow-lg mb-4">
@@ -47,7 +42,6 @@ if (!$result) {
             echo '<p class="text-gray-700 col-span-full">Aucune place touristique trouvée.</p>';
         }
 
-        // Free result set
         $result->free();
         ?>
 
@@ -57,11 +51,6 @@ if (!$result) {
 </html>
 
 <?php
-
-
-// Include the footer file
 include_once '../user/footer.php';
-$connection->close(); // Close the database connection
-
-
+$connection->close();
 ?>

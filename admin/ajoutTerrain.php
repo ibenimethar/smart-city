@@ -1,28 +1,27 @@
-<?php
-// Include the header file
+<?php 
 include_once 'headerAdmin.php';
 include_once 'ConnectionSingleton.php';
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nom = $_POST['nom'];
     $description = $_POST['description'];
-    $disponibilite = isset($_POST['disponibilite']) ? 1 : 0; // Checkbox value
+    $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
     $imageTerrain = $_FILES['imageTerrain']['name'];
-    $tempname= $_FILES['imageTerrain']['tmp_name'];
-    $targetDir = "uploads/"; // Directory to store images
-    $targetFile = $targetDir . $imageTerrain;
+    $tempname = $_FILES['imageTerrain']['tmp_name'];
+    $targetDir = "uploads/";
+    $targetFile = $targetDir . basename($imageTerrain);
 
-    // Move the uploaded file to the target directory
-    if (move_uploaded_file($tempname,$targetFile)) {
-        // Insert into database
-        $sql = "INSERT INTO terrains (`nom`, `description`, `image`, `disponibilite`) VALUES ('$nom', '$description', '$targetFile', '$disponibilite')";
-        
-        if ($connection->query($sql) === TRUE) {
-            echo "<div class='text-center text-green-500'>Terrain ajouté avec succès!</div>";
+    if (move_uploaded_file($tempname, $targetFile)) {
+        $stmt = $connection->prepare("INSERT INTO terrains (`nom`, `description`, `image`, `disponibilite`) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sssi", $nom, $description, $targetFile, $disponibilite);
+
+        if ($stmt->execute()) {
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
         } else {
-            echo "<div class='text-center text-red-500'>Erreur: " . $sql . "<br>" . $connection->error . "</div>";
+            echo "<div class='text-center text-red-500'>Erreur: " . $stmt->error . "</div>";
         }
+        $stmt->close();
     } else {
         echo "<div class='text-center text-red-500'>Erreur lors de l'upload de l'image.</div>";
     }
@@ -38,7 +37,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="font-sans bg-gray-100">
-
     <div class="container mx-auto p-4">
         <h1 class="text-4xl font-bold mb-8 text-blue-500 text-center">Ajout de Terrain</h1>
         <form action="" method="post" enctype="multipart/form-data" class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
@@ -46,10 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="mb-4">
                 <label for="nom" class="block text-sm font-medium text-gray-600">Nom du terrain:</label>
                 <select id="nom" name="nom" required class="mt-1 p-2 border border-gray-300 rounded-md w-full">
-                    <option value="Terrain Agadir">Terrain Agadir</option>
-                    <option value="Terrain Tanger">Terrain Tanger</option>
-                    <option value="Terrain Rabat">Terrain Rabat</option>
-                    <option value="Terrain Ouarzazat">Terrain Ouarzazat</option>
+                    <option value="Marrakech Sport Center">Marrakech Sport Center</option>
+                    <option value="Urbain Five 5">Urbain Five 5</option>
+                    <option value="Vitoria Complexe Sportif">Vitoria Complexe Sportif</option>
                 </select>
             </div>
 
@@ -76,15 +73,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         </form>
     </div>
-
 </body>
 <br><br>
 </html>
 
 <?php
-// Include the footer file
 include_once 'footerAdmin.php';
-
-// Close the connection
 $connection->close();
 ?>

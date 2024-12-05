@@ -1,13 +1,10 @@
 <?php
-// Include the header file
-include_once 'headerAdmin.php'; // Adjust path as necessary
+include_once 'headerAdmin.php'; 
 include_once 'ConnectionSingleton.php';
 
-// Fetch places touristiques from the database
 $query = "SELECT id, nom, description, ville, image FROM places_touristiques";
 $result = $connection->query($query);
 
-// Check if the query was successful
 if (!$result) {
     die("Query failed: " . $connection->error);
 }
@@ -26,9 +23,7 @@ if (!$result) {
         <h1 class="text-4xl font-mono text-purple-600 mb-8 col-span-full text-center border-b-8 border-blue py-6">Gestion des Places Touristiques</h1>
 
         <?php
-        // Check if there are any places to display
         if ($result->num_rows > 0) {
-            // Fetch and display each place
             while ($placeTouristique = $result->fetch_assoc()) {
                 ?>
                 <div class="bg-white rounded-lg overflow-hidden shadow-lg mb-4">
@@ -40,10 +35,8 @@ if (!$result) {
                         <p class="text-gray-700 mb-2"><strong>Ville:</strong> <?php echo htmlspecialchars($placeTouristique['ville']); ?></p>
                         <p class="text-gray-800"><?php echo htmlspecialchars($placeTouristique['description']); ?></p>
 
-                        <!-- Edit button linking to edit form -->
                         <a href="editPlace.php?id=<?php echo $placeTouristique['id']; ?>" class="bg-blue-500 text-white p-2 rounded-md mt-2 inline-block">Modifier</a>
 
-                        <!-- Delete button triggering delete script -->
                         <form action="deletePlace.php" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette place touristique ?');" class="inline-block">
                             <input type="hidden" name="id" value="<?php echo $placeTouristique['id']; ?>">
                             <button type="submit" class="bg-red-500 text-white p-2 rounded-md mt-2">Supprimer</button>
@@ -56,7 +49,6 @@ if (!$result) {
             echo '<p class="text-gray-700 col-span-full">Aucune place touristique trouvée.</p>';
         }
 
-        // Free result set
         $result->free();
         ?>
 
@@ -66,7 +58,6 @@ if (!$result) {
 </html>
 
 <?php
-// Include the footer file
 include_once 'footerAdmin.php';
-$connection->close(); // Close the database connection
+$connection->close(); 
 ?>

@@ -4,7 +4,6 @@ include_once '../admin/ConnectionSingleton.php';
 if (isset($_GET['id'])) {
     $patrimoineId = $_GET['id'];
 
-    // Delete the patrimoine from the database
     $deleteSql = "DELETE FROM patrimoine WHERE id = ?";
     $stmt = $connection->prepare($deleteSql);
     $stmt->bind_param("i", $patrimoineId);

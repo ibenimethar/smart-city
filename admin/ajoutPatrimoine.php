@@ -1,33 +1,27 @@
 <?php
-// Include the header file
 include_once 'headerAdmin.php';
 include_once 'ConnectionSingleton.php';
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nomPatrimoine = $_POST['nomPatrimoine'];
     $description = $_POST['description'];
     $prixEstime = $_POST['prixEstime'];
     $imagePatrimoine = $_FILES['imagePatrimoine']['name'];
     $tempname = $_FILES['imagePatrimoine']['tmp_name'];
-    $targetDir = "uploads/"; // Directory to store images
+    $targetDir = "uploads/";
     $targetFile = $targetDir . basename($imagePatrimoine);
     
 
-    // Move the uploaded file to the target directory
     if (move_uploaded_file($tempname, $targetFile)) {
-        // Prepare and bind
         $stmt = $connection->prepare("INSERT INTO patrimoine (`nomPatrimoine`, `description`, `prixEstime`, `imagePatrimoine`) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssds", $nomPatrimoine, $description, $prixEstime, $targetFile);
 
-        // Execute the statement
         if ($stmt->execute()) {
             echo "<div class='text-center text-green-500'>Patrimoine ajouté avec succès!</div>";
         } else {
             echo "<div class='text-center text-red-500'>Erreur: " . $stmt->error . "</div>";
         }
 
-        // Close the statement
         $stmt->close();
     } else {
         echo "<div class='text-center text-red-500'>Erreur lors de l'upload de l'image.</div>";
@@ -81,9 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </html>
 
 <?php
-// Include the footer file
 include_once 'footerAdmin.php';
 
-// Close the connection
 $connection->close();
 ?>
